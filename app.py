@@ -22,13 +22,6 @@ class Transaction(db.Model):
         self.usd_amount = usd_amount
 
 
-"""
-@app.route('/hello', methods=['GET'])
-def hello_world():
-    return "Hello World!"
-"""
-
-
 @app.route('/transaction', methods=['POST'])
 def transaction():
     try:
