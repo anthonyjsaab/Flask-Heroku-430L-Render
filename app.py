@@ -14,8 +14,8 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 bcrypt = Bcrypt(app)
 
-from .model.user import User, user_schema
-from .model.transaction import Transaction, transactions_schema, transaction_schema
+from model.user import User, user_schema
+from model.transaction import Transaction, transactions_schema, transaction_schema
 
 
 def extract_auth_token(authenticated_request):
