@@ -1,4 +1,4 @@
-from ..app import db, ma, datetime
+from app import db, ma, datetime
 
 
 class Transaction(db.Model):
