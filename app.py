@@ -113,18 +113,14 @@ def exchangeRate():
 
 @app.route('/user', methods=['POST'])
 def signup():
-    try:
-        user_name = request.json["user_name"]
-        if User.query.filter_by(user_name=user_name).first():
-            abort(403)
-        password = request.json["password"]
-        new_user = User(user_name, password)
-        db.session.add(new_user)
-        db.session.commit()
-        return jsonify(user_schema.dump(new_user))
-    except Exception as e:
-        print(e)
-        return jsonify({'Success': False})
+    user_name = request.json["user_name"]
+    if User.query.filter_by(user_name=user_name).first():
+        abort(403)
+    password = request.json["password"]
+    new_user = User(user_name, password)
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify(user_schema.dump(new_user))
 
 
 @app.route('/authentication', methods=['POST'])
