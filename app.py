@@ -115,6 +115,8 @@ def exchangeRate():
 def signup():
     try:
         user_name = request.json["user_name"]
+        if User.query.filter_by(user_name=user_name).first():
+            abort(403)
         password = request.json["password"]
         new_user = User(user_name, password)
         db.session.add(new_user)
