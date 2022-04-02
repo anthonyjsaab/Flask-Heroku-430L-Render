@@ -1,1 +1,1 @@
-DB_CONFIG = 'postgresql://namdvolrdjhlpn:78baa59a22afa567e852dae1aecab840d3a95dfc19ffe1fac9534071c7938738@ec2-52-3-60-53.compute-1.amazonaws.com:5432/dd24amg82jv611'
+DB_CONFIG = 'postgresql://xfualctpxcxeee:e7ac796d6262d65d50bf81c87afcd82eff1f83dd394f31979ebf49c53e73d747@ec2-34-197-84-74.compute-1.amazonaws.com:5432/d1j3jks48clur0'
