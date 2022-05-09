@@ -5,6 +5,7 @@ from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from db_config import DB_CONFIG
+from flask_cors import CORS
 
 SECRET_KEY = "b'|\xe7\xbfU3`\xc4\xec\xa7\xa9zf:}\xb5\xc7\xb9\x139^3@Dv'"
 app = Flask(__name__)
@@ -13,6 +14,7 @@ app.config[
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 bcrypt = Bcrypt(app)
+CORS(app)
 
 from model.user import User, user_schema
 from model.transaction import Transaction, transactions_schema, transaction_schema
