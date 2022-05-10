@@ -1,4 +1,6 @@
 import datetime
+import json
+
 import jwt
 from flask import Flask, request, jsonify, abort
 from flask_bcrypt import Bcrypt
@@ -16,8 +18,8 @@ ma = Marshmallow(app)
 bcrypt = Bcrypt(app)
 CORS(app)
 
-from model.user import User, user_schema
-from model.transaction import Transaction, transactions_schema, transaction_schema
+from .model.user import User, user_schema
+from .model.transaction import Transaction, transactions_schema, transaction_schema
 
 
 def extract_auth_token(authenticated_request):
@@ -140,3 +142,26 @@ def get_token():
         abort(403)
         return
     return jsonify({'token': create_token(relevantUser.id)})
+
+
+@app.route('/graph/<type>/<period>', methods=['GET'])
+def get_buy_points(type, period):
+    usd_to_lbp = type == "usd_to_lbp"
+    periods = {'one': (24, 30), 'five': (120, 60), 'month': (720, 1440)}
+    interval_in_minutes = periods[period][1]
+    past_hours_amount = periods[period][0]
+    start_date = datetime.datetime.now() - datetime.timedelta(hours=past_hours_amount)
+    relevant_transactions = Transaction.query.filter(
+        Transaction.added_date.between(start_date, datetime.datetime.now()), Transaction.usd_to_lbp == usd_to_lbp).all()
+
+    graph_points = []
+    for i in range(int(past_hours_amount * 60 / interval_in_minutes)):
+        center_date = start_date + datetime.timedelta(seconds=i * interval_in_minutes)
+        mini_start_date = center_date - datetime.timedelta(seconds=interval_in_minutes * 30)
+        mini_end_date = center_date + datetime.timedelta(seconds=interval_in_minutes * 30)
+        transactions_to_summarize = relevant_transactions.filter(Transaction.added_date.between(mini_start_date, mini_end_date).all())
+        summ = 0
+        for transac in transactions_to_summarize:
+            summ += transac.lbp_amount / transac.usd_amount
+        graph_points.append((i, summ/len(transactions_to_summarize)))
+    return json.dumps(graph_points, mimetype='application/json')
