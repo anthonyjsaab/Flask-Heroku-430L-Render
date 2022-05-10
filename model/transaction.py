@@ -1,4 +1,4 @@
-from ..app import db, ma, datetime
+from ..app import db, ma, timenow
 
 
 class Transaction(db.Model):
@@ -14,7 +14,7 @@ class Transaction(db.Model):
         super(Transaction, self).__init__(usd_amount=usd_amount,
                                           lbp_amount=lbp_amount, usd_to_lbp=usd_to_lbp,
                                           user_id=user_id,
-                                          added_date=datetime.datetime.now())
+                                          added_date=timenow())
 
 
 class TransactionSchema(ma.Schema):
