@@ -147,22 +147,25 @@ def get_token():
 @app.route('/graph/<type>/<period>', methods=['GET'])
 def get_buy_points(type, period):
     usd_to_lbp = type == "usd_to_lbp"
-    periods = {'one': (24, 30), 'five': (120, 60), 'month': (720, 1440)}
+    periods = {'1day': (24, 30), '5days': (120, 60), '30days': (720, 1440)}
     interval_in_minutes = periods[period][1]
     past_hours_amount = periods[period][0]
     start_date = datetime.datetime.now() - datetime.timedelta(hours=past_hours_amount)
+    print(start_date)
     relevant_transactions = Transaction.query.filter(
         Transaction.added_date.between(start_date, datetime.datetime.now()), Transaction.usd_to_lbp == usd_to_lbp)
 
     graph_points = []
-    for i in range(int(past_hours_amount * 60 / interval_in_minutes)):
-        center_date = start_date + datetime.timedelta(seconds=i * interval_in_minutes)
+    for i in range(int(past_hours_amount * 60 / interval_in_minutes) + 1):
+        center_date = start_date + datetime.timedelta(minutes=i * interval_in_minutes)
         mini_start_date = center_date - datetime.timedelta(seconds=interval_in_minutes * 30)
         mini_end_date = center_date + datetime.timedelta(seconds=interval_in_minutes * 30)
-        transactions_to_summarize = relevant_transactions.filter(Transaction.added_date.between(mini_start_date, mini_end_date)).all()
+        print(mini_start_date, mini_end_date)
+        transactions_to_summarize = relevant_transactions.filter(
+            Transaction.added_date.between(mini_start_date, mini_end_date)).all()
         if transactions_to_summarize:
             summ = 0
             for transac in transactions_to_summarize:
                 summ += transac.lbp_amount / transac.usd_amount
-            graph_points.append((i, summ/len(transactions_to_summarize)))
+            graph_points.append((i, summ / len(transactions_to_summarize)))
     return Response(json.dumps(graph_points), mimetype='application/json')
