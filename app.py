@@ -21,6 +21,7 @@ CORS(app)
 
 from .model.user import User, user_schema
 from .model.transaction import Transaction, transactions_schema, transaction_schema
+from .model.offer import Offer, offer_schema
 
 
 def timenow():
@@ -156,7 +157,7 @@ def get_buy_points(type, period):
     interval_in_minutes = periods[period][1]
     past_hours_amount = periods[period][0]
     start_date = timenow() - datetime.timedelta(hours=past_hours_amount)
-    print(start_date)
+    # print(start_date)
     relevant_transactions = Transaction.query.filter(
         Transaction.added_date.between(start_date, timenow()), Transaction.usd_to_lbp == usd_to_lbp)
 
@@ -165,7 +166,7 @@ def get_buy_points(type, period):
         center_date = start_date + datetime.timedelta(minutes=i * interval_in_minutes)
         mini_start_date = center_date - datetime.timedelta(seconds=interval_in_minutes * 30)
         mini_end_date = center_date + datetime.timedelta(seconds=interval_in_minutes * 30)
-        print(mini_start_date, mini_end_date)
+        # print(mini_start_date, mini_end_date)
         transactions_to_summarize = relevant_transactions.filter(
             Transaction.added_date.between(mini_start_date, mini_end_date)).all()
         if transactions_to_summarize:
@@ -174,3 +175,44 @@ def get_buy_points(type, period):
                 summ += transac.lbp_amount / transac.usd_amount
             graph_points.append((i, summ / len(transactions_to_summarize)))
     return Response(json.dumps(graph_points), mimetype='application/json')
+
+
+@app.route('/offer', methods=['POST'])
+def offer_POST():
+    maybe_token = extract_auth_token(request)
+    if not maybe_token:
+        abort(403)
+        return
+    else:
+        try:
+            user_id = decode_token(maybe_token)
+        except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError):
+            abort(403)
+            return
+    usd_amount = request.json["usd_amount"]
+    rate = request.json["rate"]
+    usd_to_lbp = request.json["usd_to_lbp"]
+    new_offer = Offer(usd_amount, rate, usd_to_lbp, user_id)
+    db.session.add(new_offer)
+    db.session.commit()
+    return jsonify(offer_schema.dump(new_offer))
+
+
+@app.route('/offer/<start>/<end>', methods=['GET'])
+def offer_GET(start, end):
+    maybe_token = extract_auth_token(request)
+    if not maybe_token:
+        abort(403)
+        return
+    try:
+        user_id = decode_token(maybe_token)
+    except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError):
+        abort(403)
+        return
+    all_offers = Offer.query.filter_by(user_id=user_id).all()
+    if end > len(all_offers):
+        end = len(all_offers)
+    if start < 1:
+        start = 1
+    relevant_offers = all_offers[-end: -start]
+    return jsonify(transactions_schema.dump(relevant_offers))

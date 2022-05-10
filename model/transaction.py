@@ -1,7 +1,9 @@
 from ..app import db, ma, datetime, pytz
 
+
 def timenow():
     return datetime.datetime.now(pytz.timezone("Asia/Beirut"))
+
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
