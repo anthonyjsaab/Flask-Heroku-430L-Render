@@ -8,6 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from db_config import DB_CONFIG
 from flask_cors import CORS
+import pytz
 
 SECRET_KEY = "b'|\xe7\xbfU3`\xc4\xec\xa7\xa9zf:}\xb5\xc7\xb9\x139^3@Dv'"
 app = Flask(__name__)
@@ -20,6 +21,10 @@ CORS(app)
 
 from .model.user import User, user_schema
 from .model.transaction import Transaction, transactions_schema, transaction_schema
+
+
+def timenow():
+    return datetime.datetime.now(pytz.timezone("Asia/Beirut"))
 
 
 def extract_auth_token(authenticated_request):
@@ -37,8 +42,8 @@ def decode_token(token):
 
 def create_token(user_id):
     payload = {
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=4),
-        'iat': datetime.datetime.utcnow(),
+        'exp': timenow() + datetime.timedelta(days=4),
+        'iat': timenow(),
         'sub': user_id
     }
     return jwt.encode(
@@ -86,8 +91,8 @@ def transaction_GET():
 @app.route('/exchangeRate', methods=['GET'])
 def exchangeRate():
     allTransactions = Transaction.query.filter(
-        Transaction.added_date.between(datetime.datetime.now() - datetime.timedelta(hours=72),
-                                       datetime.datetime.now())).all()
+        Transaction.added_date.between(timenow() - datetime.timedelta(hours=72),
+                                       timenow())).all()
     usd_sell_rates_sum = 0
     usd_buy_rates_sum = 0
     total_sells = 0
@@ -150,10 +155,10 @@ def get_buy_points(type, period):
     periods = {'1day': (24, 30), '5days': (120, 60), '30days': (720, 1440)}
     interval_in_minutes = periods[period][1]
     past_hours_amount = periods[period][0]
-    start_date = datetime.datetime.now() - datetime.timedelta(hours=past_hours_amount)
+    start_date = timenow() - datetime.timedelta(hours=past_hours_amount)
     print(start_date)
     relevant_transactions = Transaction.query.filter(
-        Transaction.added_date.between(start_date, datetime.datetime.now()), Transaction.usd_to_lbp == usd_to_lbp)
+        Transaction.added_date.between(start_date, timenow()), Transaction.usd_to_lbp == usd_to_lbp)
 
     graph_points = []
     for i in range(int(past_hours_amount * 60 / interval_in_minutes) + 1):
