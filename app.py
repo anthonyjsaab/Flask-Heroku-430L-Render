@@ -198,9 +198,14 @@ def offer_POST():
         except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError):
             abort(403)
             return
-    usd_amount = request.json["usd_amount"]
-    rate = request.json["rate"]
-    usd_to_lbp = request.json["usd_to_lbp"]
+        try:
+            usd_amount = float(request.json["usd_amount"])
+            rate = float(request.json["rate"])
+            usd_to_lbp = request.json["usd_to_lbp"]
+            print(type(usd_to_lbp))
+        except:
+            abort(400)
+            return
     new_offer = Offer(usd_amount, rate, usd_to_lbp, user_id)
     db.session.add(new_offer)
     db.session.commit()
