@@ -19,9 +19,9 @@ ma = Marshmallow(app)
 bcrypt = Bcrypt(app)
 CORS(app)
 
-from .model.user import User, user_schema
-from .model.transaction import Transaction, transactions_schema, transaction_schema
-from .model.offer import Offer, offer_schema, offers_schema
+from model.user import User, user_schema
+from model.transaction import Transaction, transactions_schema, transaction_schema
+from model.offer import Offer, offer_schema, offers_schema
 
 
 def timenow():
@@ -218,4 +218,4 @@ def offer_GET(start, end):
         relevant_offers = all_offers[-end:]
     else:
         relevant_offers = all_offers[-end:-start]
-    return jsonify(transactions_schema.dump(relevant_offers))
+    return jsonify(offers_schema.dump(relevant_offers))
