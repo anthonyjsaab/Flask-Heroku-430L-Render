@@ -218,7 +218,17 @@ def offer_GET(start, end):
         start, end = int(start), int(end)
     except:
         abort(400)
-    all_offers = Offer.query.all()
+    maybe_token = extract_auth_token(request)
+    authenticated = None
+    try:
+        user_id = decode_token(maybe_token)
+        authenticated = True
+    except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError):
+        authenticated = False
+    if not authenticated:
+        all_offers = Offer.query.all()
+    else:
+        all_offers = Offer.query.filter_by(user_id=user_id).all()
     if end > len(all_offers) and start <= 1:
         relevant_offers = all_offers
     elif end > len(all_offers):
