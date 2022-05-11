@@ -1,4 +1,4 @@
-from app import db, ma, datetime, pytz, User
+from ..app import db, ma, datetime, pytz, User
 
 
 def timenow():

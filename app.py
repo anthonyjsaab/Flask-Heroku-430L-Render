@@ -19,9 +19,9 @@ ma = Marshmallow(app)
 bcrypt = Bcrypt(app)
 CORS(app)
 
-from model.user import User, user_schema
-from model.transaction import Transaction, transactions_schema, transaction_schema
-from model.offer import Offer, offer_schema, offers_schema
+from .model.user import User, user_schema
+from .model.transaction import Transaction, transactions_schema, transaction_schema
+from .model.offer import Offer, offer_schema, offers_schema
 
 
 def timenow():
