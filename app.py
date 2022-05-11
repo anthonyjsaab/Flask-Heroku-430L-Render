@@ -25,7 +25,7 @@ from .model.offer import Offer, offer_schema, offers_schema
 
 
 def timenow():
-    return datetime.datetime.now(pytz.timezone("Asia/Beirut"))
+    return datetime.datetime.utcnow()
 
 
 def extract_auth_token(authenticated_request):

@@ -2,7 +2,7 @@ from ..app import db, ma, datetime, pytz, User
 
 
 def timenow():
-    return datetime.datetime.now(pytz.timezone("Asia/Beirut"))
+    return datetime.datetime.utcnow()
 
 
 class Offer(db.Model):
