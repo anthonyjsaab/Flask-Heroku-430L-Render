@@ -1,4 +1,4 @@
-from app import db, ma, bcrypt
+from ..app import db, ma, bcrypt
 
 
 class User(db.Model):
@@ -7,8 +7,8 @@ class User(db.Model):
     phone = db.Column(db.String(30))
     hashed_password = db.Column(db.String(128))
 
-    def __init__(self, user_name, password):
-        super(User, self).__init__(user_name=user_name)
+    def __init__(self, user_name, phone, password):
+        super(User, self).__init__(user_name=user_name, phone=phone)
         self.hashed_password = bcrypt.generate_password_hash(password).decode('utf8')
 
 

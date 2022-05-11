@@ -19,9 +19,9 @@ ma = Marshmallow(app)
 bcrypt = Bcrypt(app)
 CORS(app)
 
-from model.user import User, user_schema
-from model.transaction import Transaction, transactions_schema, transaction_schema
-from model.offer import Offer, offer_schema, offers_schema
+from .model.user import User, user_schema
+from .model.transaction import Transaction, transactions_schema, transaction_schema
+from .model.offer import Offer, offer_schema, offers_schema
 
 
 def timenow():
@@ -123,12 +123,15 @@ def exchangeRate():
 
 @app.route('/user', methods=['POST'])
 def signup():
-    user_name = request.json["user_name"]
+    try:
+        user_name = request.json["user_name"]
+        password = request.json["password"]
+        phone = request.json["phone"]
+    except:
+        abort(400)
     if User.query.filter_by(user_name=user_name).first():
         abort(403)
-    password = request.json["password"]
-    phone = request.json["phone"]
-    new_user = User(user_name, password)
+    new_user = User(user_name, phone, password)
     db.session.add(new_user)
     db.session.commit()
     return jsonify(user_schema.dump(new_user))
