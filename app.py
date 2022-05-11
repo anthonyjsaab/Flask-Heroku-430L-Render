@@ -212,7 +212,7 @@ def offer_POST():
     return jsonify(offer_schema.dump(new_offer))
 
 
-@app.route('/offer/<start>/<end>', methods=['GET'])
+@app.route('/offer/list/<start>/<end>', methods=['GET'])
 def offer_GET(start, end):
     try:
         start, end = int(start), int(end)
@@ -239,3 +239,38 @@ def offer_GET(start, end):
     else:
         relevant_offers = all_offers[-end:-start]
     return jsonify(offers_schema.dump(relevant_offers))
+
+
+@app.route('/offer/close/<type>/<offer_id>', methods=['GET'])
+def offer_close(type, offer_id):
+    if type not in ["cancel", "confirm"]:
+        abort(400)
+        return
+    maybe_token = extract_auth_token(request)
+    if not maybe_token:
+        abort(403)
+        return
+    else:
+        try:
+            offer_id = int(offer_id)
+            user_id = decode_token(maybe_token)
+        except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError):
+            abort(403)
+            return
+    relevant_offer_set = Offer.query.filter_by(id=offer_id)
+    try:
+        offer = relevant_offer_set.all()[0]
+    except:
+        abort(404)
+    if offer.user_id != user_id:
+        abort(403)
+        return
+    else:
+        if type == "confirm":
+            new_transaction = Transaction(offer.usd_amount, offer.usd_amount * offer.rate, offer.usd_to_lbp, user_id)
+            db.session.add(new_transaction)
+            db.session.commit()
+    return_val = jsonify(offers_schema.dump([offer]))
+    relevant_offer_set.delete()
+    db.session.commit()
+    return return_val
