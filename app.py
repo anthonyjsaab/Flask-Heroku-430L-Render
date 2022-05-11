@@ -141,9 +141,9 @@ def exchangeRate():
         print(graph_points)
         if len(graph_points) >= 2:
             if usd_to_lbp:
-                return_json["sell_fluct"] = (graph_points[0][1] - graph_points[-1][1]) * 100 / graph_points[-1][1]
+                return_json["sell_fluct"] = (graph_points[-1][1] - graph_points[0][1]) * 100 / graph_points[0][1]
             else:
-                return_json["buy_fluct"] = (graph_points[0][1] - graph_points[-1][1]) * 100 / graph_points[-1][1]
+                return_json["buy_fluct"] = (graph_points[-1][1] - graph_points[0][1]) * 100 / graph_points[0][1]
     return jsonify(return_json)
 
 
