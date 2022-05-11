@@ -1,4 +1,4 @@
-from ..app import db, ma, datetime, pytz
+from app import db, ma, datetime, pytz
 
 
 def timenow():
@@ -11,6 +11,7 @@ class Offer(db.Model):
     rate = db.Column(db.Float)
     usd_to_lbp = db.Column(db.Boolean)
     added_date = db.Column(db.DateTime)
+    contact_phone = db.Column(db.String)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'),
                         nullable=True)
 

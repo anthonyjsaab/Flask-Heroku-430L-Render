@@ -1,9 +1,10 @@
-from ..app import db, ma, bcrypt
+from app import db, ma, bcrypt
 
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_name = db.Column(db.String(30), unique=True)
+    phone = db.Column(db.String(30))
     hashed_password = db.Column(db.String(128))
 
     def __init__(self, user_name, password):
@@ -13,7 +14,7 @@ class User(db.Model):
 
 class UserSchema(ma.Schema):
     class Meta:
-        fields = ("id", "user_name", "hashed_password")
+        fields = ("id", "user_name", "phone", "hashed_password")
         model = User
 
 

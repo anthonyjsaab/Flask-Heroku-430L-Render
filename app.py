@@ -127,6 +127,7 @@ def signup():
     if User.query.filter_by(user_name=user_name).first():
         abort(403)
     password = request.json["password"]
+    phone = request.json["phone"]
     new_user = User(user_name, password)
     db.session.add(new_user)
     db.session.commit()
