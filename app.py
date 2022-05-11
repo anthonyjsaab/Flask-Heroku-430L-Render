@@ -111,13 +111,39 @@ def exchangeRate():
             usd_buy_rates_sum += current_rate
             total_buys += 1
 
-    return_json = {"usd_to_lbp": None, "lbp_to_usd": None}
+    return_json = {"usd_to_lbp": None, "lbp_to_usd": None, 'buy_fluct': None, 'sell_fluct': None}
 
     if total_sells:
         return_json["usd_to_lbp"] = int(usd_sell_rates_sum * 100 / total_sells) / 100
     if total_buys:
         return_json["lbp_to_usd"] = int(usd_buy_rates_sum * 100 / total_buys) / 100
+    interval_in_minutes = 30
+    past_hours_amount = 24
+    for usd_to_lbp in [True, False]:
+        start_date = timenow() - datetime.timedelta(hours=past_hours_amount)
+        # print(start_date)
+        relevant_transactions = Transaction.query.filter(
+            Transaction.added_date.between(start_date, timenow()), Transaction.usd_to_lbp == usd_to_lbp)
 
+        graph_points = []
+        for i in range(int(past_hours_amount * 60 / interval_in_minutes) + 1):
+            center_date = start_date + datetime.timedelta(minutes=i * interval_in_minutes)
+            mini_start_date = center_date - datetime.timedelta(seconds=interval_in_minutes * 30)
+            mini_end_date = center_date + datetime.timedelta(seconds=interval_in_minutes * 30)
+            # print(mini_start_date, mini_end_date)
+            transactions_to_summarize = relevant_transactions.filter(
+                Transaction.added_date.between(mini_start_date, mini_end_date)).all()
+            if transactions_to_summarize:
+                summ = 0
+                for transac in transactions_to_summarize:
+                    summ += transac.lbp_amount / transac.usd_amount
+                graph_points.append((i, summ / len(transactions_to_summarize)))
+        print(graph_points)
+        if len(graph_points) >= 2:
+            if usd_to_lbp:
+                return_json["sell_fluct"] = (graph_points[0][1] - graph_points[-1][1]) * 100 / graph_points[-1][1]
+            else:
+                return_json["buy_fluct"] = (graph_points[0][1] - graph_points[-1][1]) * 100 / graph_points[-1][1]
     return jsonify(return_json)
 
 
