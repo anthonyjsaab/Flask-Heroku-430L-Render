@@ -219,12 +219,13 @@ def offer_GET(start, end):
     except:
         abort(400)
     maybe_token = extract_auth_token(request)
-    authenticated = None
-    try:
-        user_id = decode_token(maybe_token)
-        authenticated = True
-    except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError):
-        authenticated = False
+    authenticated = False
+    if maybe_token:
+        try:
+            user_id = decode_token(maybe_token)
+            authenticated = True
+        except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError):
+            authenticated = False
     if not authenticated:
         all_offers = Offer.query.all()
     else:
