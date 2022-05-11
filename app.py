@@ -21,7 +21,7 @@ CORS(app)
 
 from .model.user import User, user_schema
 from .model.transaction import Transaction, transactions_schema, transaction_schema
-from .model.offer import Offer, offer_schema
+from .model.offer import Offer, offer_schema, offers_schema
 
 
 def timenow():
@@ -151,11 +151,16 @@ def get_token():
 
 
 @app.route('/graph/<type>/<period>', methods=['GET'])
-def get_buy_points(type, period):
-    usd_to_lbp = type == "usd_to_lbp"
+def get_points(type, period):
     periods = {'1day': (24, 30), '5days': (120, 60), '30days': (720, 1440)}
-    interval_in_minutes = periods[period][1]
-    past_hours_amount = periods[period][0]
+    try:
+        assert type in ["usd_to_lbp", "lbp_to_usd"], "Invalid type"
+        interval_in_minutes = periods[period][1]
+        past_hours_amount = periods[period][0]
+    except:
+        abort(400)
+        return
+    usd_to_lbp = type == "usd_to_lbp"
     start_date = timenow() - datetime.timedelta(hours=past_hours_amount)
     # print(start_date)
     relevant_transactions = Transaction.query.filter(
@@ -200,19 +205,17 @@ def offer_POST():
 
 @app.route('/offer/<start>/<end>', methods=['GET'])
 def offer_GET(start, end):
-    maybe_token = extract_auth_token(request)
-    if not maybe_token:
-        abort(403)
-        return
     try:
-        user_id = decode_token(maybe_token)
-    except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError):
-        abort(403)
-        return
-    all_offers = Offer.query.filter_by(user_id=user_id).all()
-    if end > len(all_offers):
-        end = len(all_offers)
-    if start < 1:
-        start = 1
-    relevant_offers = all_offers[-end: -start]
+        start, end = int(start), int(end)
+    except:
+        abort(400)
+    all_offers = Offer.query.all()
+    if end > len(all_offers) and start <= 1:
+        relevant_offers = all_offers
+    elif end > len(all_offers):
+        relevant_offers = all_offers[:-start]
+    elif start <= 1:
+        relevant_offers = all_offers[-end:]
+    else:
+        relevant_offers = all_offers[-end:-start]
     return jsonify(transactions_schema.dump(relevant_offers))
