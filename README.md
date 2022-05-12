@@ -22,4 +22,5 @@ A full technical documentation of the backend can be found here: [https://docs.4
 
 # Deployed version
 
-A deployed version of the backend can be seen here: [https://web.430L.mL](https://web.430L.mL).
+A deployed version of the backend can be seen here: [https://430L.mL](https://430L.mL).
+The corresponding web app can be seen here: [https://web.430L.mL](https://web.430L.mL).
