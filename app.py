@@ -62,7 +62,7 @@ def transaction_POST():
     else:
         try:
             user_id = decode_token(maybe_token)
-        except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError):
+        except:
             abort(403)
             return
     usd_amount = request.json["usd_amount"]
