@@ -88,7 +88,7 @@ def transaction_GET():
         return
     try:
         user_id = decode_token(maybe_token)
-    except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError):
+    except:
         abort(403)
         return
     relevant_transactions = Transaction.query.filter_by(user_id=user_id)
