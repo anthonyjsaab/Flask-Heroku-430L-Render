@@ -68,6 +68,12 @@ def transaction_POST():
     usd_amount = request.json["usd_amount"]
     lbp_amount = request.json["lbp_amount"]
     usd_to_lbp = request.json["usd_to_lbp"]
+    try:
+        assert type(usd_to_lbp) == bool
+        assert type(usd_amount) in [float, int]
+        assert type(lbp_amount) in [float, int]
+    except:
+        abort(400)
     new_transaction = Transaction(usd_amount, lbp_amount, usd_to_lbp, user_id)
     db.session.add(new_transaction)
     db.session.commit()
@@ -92,7 +98,7 @@ def transaction_GET():
 @app.route('/exchangeRate', methods=['GET'])
 def exchangeRate():
     allTransactions = Transaction.query.filter(
-        Transaction.added_date.between(timenow() - datetime.timedelta(hours=72),
+        Transaction.added_date.between(timenow() - datetime.timedelta(hours=24),
                                        timenow())).all()
     usd_sell_rates_sum = 0
     usd_buy_rates_sum = 0
@@ -250,8 +256,8 @@ def offer_GET(start, end):
         try:
             user_id = decode_token(maybe_token)
             authenticated = True
-        except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError):
-            authenticated = False
+        except:
+            abort(403)
     if not authenticated:
         all_offers = Offer.query.all()
     else:
