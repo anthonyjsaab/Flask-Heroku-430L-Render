@@ -20,7 +20,7 @@ This repo includes 2 branches: `main` and `heroku`. Both are identical in featur
 
 A full technical documentation of the backend can be found here: [https://docs.430L.mL](https://docs.430L.mL).
 
-# Deployed version
+# Deployed version (SERVERS DOWN INDEFINITELY)
 
 A deployed version of the backend can be seen here: [https://430L.mL](https://430L.mL).
 The corresponding web app can be seen here: [https://web.430L.mL](https://web.430L.mL).
