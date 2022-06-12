@@ -18,7 +18,7 @@ This repo includes 2 branches: `main` and `heroku`. Both are identical in featur
 
 # Technical Documentation
 
-A full technical documentation of the backend can be found here: [https://docs.430L.mL](https://docs.430L.mL).
+A full technical documentation of the backend can be found here: ~~[https://docs.430L.mL](https://docs.430L.mL).~~ [https://anthonyjsaab.github.io/docs.430L.mL/](https://anthonyjsaab.github.io/docs.430L.mL/)
 
 # Deployed version (SERVERS DOWN INDEFINITELY)
 
